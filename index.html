@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>The First Months of the War: A Calendar of Emotions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1E2530;
+            color: #E0E0E0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1E2530;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #E0E0E0;
+            opacity: 0.9;
+        }
+
+        .loading-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        #tap-to-begin {
+            padding: 1rem 2rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            font-size: 1.1rem;
+            color: #E0E0E0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        #tap-to-begin:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #6f91ae;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            color: #E0E0E0;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 0 0 auto;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-info {
+            font-size: 1.1rem;
+            padding: 0.8rem 1.5rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            min-width: 120px;
+            text-align: center;
+            flex: 0 0 auto;
+            color: #E0E0E0;
+        }
+
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 1200px) {
+            .calendar-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .month-calendar {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.3s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        .month-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .month-title {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #E0E0E0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            min-height: 300px;
+        }
+        
+        .day-header {
+            text-align: center;
+            padding: 0.8rem 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 400;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 1px solid #555555;
+            background-color: rgba(240, 240, 240, 0.1);
+        }
+
+        .day-cell.in-period {
+            background-color: transparent;
+        }
+
+        .day-cell.current {
+            animation: pulse-glow 1.5s ease-in-out infinite;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .day-cell.pulsing {
+            animation: double-pulse 0.6s ease-in-out;
+        }
+        
+        .day-cell:hover {
+            transform: scale(1.05);
+            z-index: 5;
+        }
+
+        .day-cell .info-icon {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .day-cell:hover .info-icon {
+            opacity: 1;
+        }
+        
+        .day-cell:empty,
+        .day-cell.empty-cell,
+        .day-cell.pre-post-period {
+            background-color: transparent !important;
+            border: none !important;
+            color: transparent !important;
+            cursor: default !important;
+            pointer-events: none !important;
+            box-shadow: none !important;
+        }
+
+        .day-cell.pre-post-period:hover {
+            transform: none !important;
+        }
+        
+        .stats-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            transform: translateY(-10px);
+            background-color: rgba(30, 37, 48, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 1.2rem;
+            min-width: 220px;
+            max-width: 250px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            pointer-events: none;
+        }
+
+        .stats-popup.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-15px);
+        }
+
+        .stats-popup.left-edge { left: 0; right: auto; }
+        .stats-popup.right-edge { left: auto; right: 0; }
+
+        .stats-title {
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .emotion-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .emotion-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .emotion-name {
+            min-width: 80px;
+            margin-right: 0.8rem;
+        }
+
+        .bar-container {
+            flex-grow: 1;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .emotion-count {
+            min-width: 30px;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        #summary-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(30, 37, 48, 0.98);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        #summary-screen.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .summary-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .summary-bars {
+            width: 500px;
+            max-width: 80%;
+        }
+
+        .summary-bar {
+            margin-bottom: 2rem;
+        }
+
+        .summary-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .summary-bar-fill {
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .summary-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 1.5s ease-out;
+        }
+
+        .footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2rem;
+        }
+
+        .credit-line { margin-bottom: 0.5rem; }
+        .instructions { font-size: 0.85rem; opacity: 0.6; }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.2); transform: scale(1); }
+            50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); transform: scale(1.05); }
+        }
+
+        @keyframes double-pulse {
+            0%, 100% { transform: scale(1); }
+            25%, 75% { transform: scale(1.1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .main-title { font-size: 2rem; }
+            .month-calendar { padding: 1rem; }
+            .day-cell { font-size: 1rem; }
+            .stats-popup { max-width: 200px; min-width: 180px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loading-title">The First Months of the War</div>
+        <div class="loading-subtitle">A Calendar of Emotions</div>
+        <div class="progress-bar"><div class="progress-fill" id="loading-progress"></div></div>
+        <div id="tap-to-begin">Tap to Begin</div>
+    </div>
+
+    <div class="container" id="main-container">
+        <header class="header">
+            <h1 class="main-title">The First Months of the War: A Calendar of Emotions</h1>
+            <div class="subtitle">Daily emotional landscape from February 24 to April 23, 2022</div>
+            <div class="instructions" style="margin-top: 1rem; font-size: 1rem; opacity: 0.8;">
+                Hover to explore daily emotions · Click Play to animate the timeline
+            </div>
+        </header>
+
+        <div class="controls">
+            <button class="control-btn" id="play-btn"><span class="btn-icon">▶</span> <span id="play-text">Play</span></button>
+            <button class="control-btn" id="pause-btn" disabled><span class="btn-icon">❚❚</span> Pause</button>
+            <button class="control-btn" id="reset-btn"><span class="btn-icon">⟲</span> Reset</button>
+            <div class="progress-info" id="progress-info">Day <span id="current-day">1</span>/59</div>
+            <button class="control-btn" id="audio-toggle"><span class="btn-icon">🔊</span> Sound</button>
+        </div>
+
+        <div class="calendar-container" id="calendar-container">
+            <div class="month-calendar" id="february-calendar" data-month="2">
+                <div class="month-header"><h2 class="month-title">February 2022</h2></div>
+                <div class="calendar-grid" id="february-grid"></div>
+            </div>
+            <div class="month-calendar" id="march-calendar" data-month="3">
+                <div class="month-header"><h2 class="month-title">March 2022</h2></div>
+                <div class="calendar-grid" id="march-grid"></div>
+            </div>
+            <div class="month-calendar" id="april-calendar" data-month="4">
+                <div class="month-header"><h2 class="month-title">April 2022</h2></div>
+                <div class="calendar-grid" id="april-grid"></div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="credit-line">Data source: <a href="https://www.lvivcenter.org/en/researches/diaries-and-dreams-of-the-war-2/" target="_blank" style="text-decoration: none; color: inherit;">Diaries and Dreams of the War</a> archives at the Center for Urban History, Lviv</div>
+            <div class="credit-line">Idea, computation and visualization: Yevhenii Poliakov</div>
+            <div class="instructions">The project was supported by a scholarship from the Institute for Human Sciences (IWM) in Vienna as part of the 'Documenting Ukraine' initiative.</div>
+        </footer>
+    </div>
+
+    <div id="summary-screen">
+        <h2 class="summary-title">Dominant Emotions</h2>
+        <div class="summary-bars" id="summary-bars"></div>
+        <div class="instructions" style="margin-top: 3rem; font-size: 1rem;">Animation will restart in <span id="restart-countdown">5</span> seconds...</div>
+    </div>
+
+    <script>
+        const EMOTION_DATA = {
+            '2022-02-24': { admiration: 2, anger: 8, envy: 0, fear: 33, joy: 1, love: 6, motivation: 12, sadness: 10, shame: 4, shock: 16, total: 92, dominant: 'fear' },
+            '2022-02-25': { admiration: 1, anger: 14, envy: 0, fear: 20, joy: 7, love: 2, motivation: 14, sadness: 6, shame: 5, shock: 4, total: 73, dominant: 'fear' },
+            '2022-02-26': { admiration: 4, anger: 4, envy: 0, fear: 8, joy: 4, love: 2, motivation: 2, sadness: 2, shame: 0, shock: 1, total: 27, dominant: 'fear' },
+            '2022-02-27': { admiration: 1, anger: 3, envy: 0, fear: 3, joy: 0, love: 0, motivation: 3, sadness: 4, shame: 0, shock: 3, total: 17, dominant: 'sadness' },
+            '2022-02-28': { admiration: 1, anger: 2, envy: 0, fear: 4, joy: 0, love: 1, motivation: 7, sadness: 1, shame: 2, shock: 1, total: 19, dominant: 'motivation' },
+            '2022-03-01': { admiration: 1, anger: 3, envy: 0, fear: 6, joy: 2, love: 0, motivation: 9, sadness: 2, shame: 4, shock: 0, total: 27, dominant: 'motivation' },
+            '2022-03-02': { admiration: 9, anger: 15, envy: 0, fear: 19, joy: 9, love: 3, motivation: 18, sadness: 12, shame: 4, shock: 10, total: 99, dominant: 'fear' },
+            '2022-03-03': { admiration: 5, anger: 18, envy: 0, fear: 28, joy: 10, love: 4, motivation: 26, sadness: 15, shame: 7, shock: 8, total: 121, dominant: 'fear' },
+            '2022-03-04': { admiration: 10, anger: 17, envy: 0, fear: 27, joy: 7, love: 1, motivation: 20, sadness: 17, shame: 10, shock: 4, total: 113, dominant: 'fear' },
+            '2022-03-05': { admiration: 13, anger: 28, envy: 1, fear: 29, joy: 10, love: 3, motivation: 21, sadness: 15, shame: 9, shock: 3, total: 132, dominant: 'fear' },
+            '2022-03-06': { admiration: 2, anger: 12, envy: 0, fear: 22, joy: 12, love: 1, motivation: 8, sadness: 6, shame: 6, shock: 6, total: 75, dominant: 'fear' },
+            '2022-03-07': { admiration: 4, anger: 7, envy: 0, fear: 12, joy: 5, love: 1, motivation: 9, sadness: 12, shame: 4, shock: 2, total: 56, dominant: 'fear' },
+            '2022-03-08': { admiration: 8, anger: 9, envy: 0, fear: 17, joy: 10, love: 2, motivation: 16, sadness: 13, shame: 3, shock: 1, total: 79, dominant: 'fear' },
+            '2022-03-09': { admiration: 3, anger: 12, envy: 0, fear: 16, joy: 4, love: 1, motivation: 8, sadness: 8, shame: 8, shock: 8, total: 68, dominant: 'fear' },
+            '2022-03-10': { admiration: 4, anger: 3, envy: 0, fear: 13, joy: 6, love: 1, motivation: 8, sadness: 5, shame: 4, shock: 1, total: 45, dominant: 'fear' },
+            '2022-03-11': { admiration: 4, anger: 11, envy: 0, fear: 16, joy: 1, love: 0, motivation: 6, sadness: 10, shame: 2, shock: 2, total: 52, dominant: 'fear' },
+            '2022-03-12': { admiration: 3, anger: 10, envy: 0, fear: 16, joy: 5, love: 1, motivation: 10, sadness: 8, shame: 5, shock: 2, total: 60, dominant: 'fear' },
+            '2022-03-13': { admiration: 0, anger: 13, envy: 0, fear: 17, joy: 4, love: 0, motivation: 8, sadness: 8, shame: 1, shock: 3, total: 54, dominant: 'fear' },
+            '2022-03-14': { admiration: 10, anger: 9, envy: 0, fear: 8, joy: 11, love: 0, motivation: 11, sadness: 6, shame: 3, shock: 3, total: 61, dominant: ['joy', 'motivation'] },
+            '2022-03-15': { admiration: 6, anger: 10, envy: 0, fear: 14, joy: 19, love: 2, motivation: 18, sadness: 8, shame: 3, shock: 1, total: 81, dominant: 'joy' },
+            '2022-03-16': { admiration: 3, anger: 8, envy: 0, fear: 14, joy: 7, love: 2, motivation: 13, sadness: 11, shame: 2, shock: 6, total: 66, dominant: 'fear' },
+            '2022-03-17': { admiration: 6, anger: 3, envy: 0, fear: 8, joy: 5, love: 0, motivation: 8, sadness: 8, shame: 0, shock: 2, total: 40, dominant: ['fear', 'motivation', 'sadness'] },
+            '2022-03-18': { admiration: 0, anger: 3, envy: 0, fear: 8, joy: 1, love: 1, motivation: 5, sadness: 3, shame: 1, shock: 3, total: 25, dominant: 'fear' },
+            '2022-03-19': { admiration: 1, anger: 5, envy: 0, fear: 5, joy: 5, love: 1, motivation: 2, sadness: 4, shame: 0, shock: 1, total: 24, dominant: ['anger', 'fear', 'joy'] },
+            '2022-03-20': { admiration: 3, anger: 6, envy: 0, fear: 6, joy: 4, love: 0, motivation: 3, sadness: 8, shame: 2, shock: 1, total: 33, dominant: 'sadness' },
+            '2022-03-21': { admiration: 4, anger: 8, envy: 0, fear: 8, joy: 5, love: 2, motivation: 4, sadness: 7, shame: 0, shock: 1, total: 39, dominant: ['anger', 'fear'] },
+            '2022-03-22': { admiration: 1, anger: 5, envy: 0, fear: 8, joy: 5, love: 3, motivation: 7, sadness: 5, shame: 2, shock: 3, total: 39, dominant: 'fear' },
+            '2022-03-23': { admiration: 4, anger: 7, envy: 0, fear: 6, joy: 6, love: 1, motivation: 2, sadness: 6, shame: 2, shock: 2, total: 36, dominant: 'anger' },
+            '2022-03-24': { admiration: 0, anger: 7, envy: 0, fear: 12, joy: 3, love: 2, motivation: 4, sadness: 8, shame: 0, shock: 2, total: 38, dominant: 'fear' },
+            '2022-03-25': { admiration: 5, anger: 2, envy: 0, fear: 5, joy: 4, love: 2, motivation: 4, sadness: 3, shame: 1, shock: 0, total: 26, dominant: ['admiration', 'fear'] },
+            '2022-03-26': { admiration: 1, anger: 4, envy: 0, fear: 13, joy: 6, love: 0, motivation: 1, sadness: 2, shame: 3, shock: 3, total: 33, dominant: 'fear' },
+            '2022-03-27': { admiration: 1, anger: 3, envy: 0, fear: 8, joy: 4, love: 1, motivation: 3, sadness: 6, shame: 3, shock: 1, total: 30, dominant: 'fear' },
+            '2022-03-28': { admiration: 0, anger: 3, envy: 0, fear: 3, joy: 2, love: 0, motivation: 1, sadness: 4, shame: 0, shock: 3, total: 16, dominant: 'sadness' },
+            '2022-03-29': { admiration: 2, anger: 7, envy: 0, fear: 8, joy: 2, love: 4, motivation: 2, sadness: 10, shame: 1, shock: 1, total: 37, dominant: 'sadness' },
+            '2022-03-30': { admiration: 0, anger: 4, envy: 0, fear: 4, joy: 6, love: 4, motivation: 7, sadness: 5, shame: 1, shock: 0, total: 31, dominant: 'motivation' },
+            '2022-03-31': { admiration: 2, anger: 5, envy: 0, fear: 7, joy: 3, love: 2, motivation: 7, sadness: 3, shame: 1, shock: 0, total: 30, dominant: ['fear', 'motivation'] },
+            '2022-04-01': { admiration: 3, anger: 15, envy: 0, fear: 6, joy: 7, love: 2, motivation: 4, sadness: 4, shame: 6, shock: 4, total: 51, dominant: 'anger' },
+            '2022-04-02': { admiration: 0, anger: 7, envy: 0, fear: 1, joy: 3, love: 1, motivation: 4, sadness: 5, shame: 1, shock: 1, total: 23, dominant: 'anger' },
+            '2022-04-03': { admiration: 2, anger: 13, envy: 0, fear: 10, joy: 3, love: 0, motivation: 3, sadness: 6, shame: 3, shock: 9, total: 49, dominant: 'anger' },
+            '2022-04-04': { admiration: 1, anger: 7, envy: 0, fear: 7, joy: 1, love: 1, motivation: 5, sadness: 10, shame: 0, shock: 3, total: 35, dominant: 'sadness' },
+            '2022-04-05': { admiration: 1, anger: 4, envy: 0, fear: 4, joy: 3, love: 0, motivation: 4, sadness: 7, shame: 3, shock: 2, total: 28, dominant: 'sadness' },
+            '2022-04-06': { admiration: 0, anger: 4, envy: 0, fear: 2, joy: 2, love: 1, motivation: 1, sadness: 2, shame: 1, shock: 0, total: 13, dominant: 'anger' },
+            '2022-04-07': { admiration: 1, anger: 5, envy: 0, fear: 8, joy: 4, love: 2, motivation: 3, sadness: 5, shame: 0, shock: 2, total: 30, dominant: 'fear' },
+            '2022-04-08': { admiration: 2, anger: 1, envy: 0, fear: 3, joy: 7, love: 0, motivation: 6, sadness: 5, shame: 1, shock: 1, total: 26, dominant: 'joy' },
+            '2022-04-09': { admiration: 1, anger: 1, envy: 0, fear: 5, joy: 6, love: 2, motivation: 4, sadness: 3, shame: 1, shock: 1, total: 24, dominant: 'joy' },
+            '2022-04-10': { admiration: 1, anger: 1, envy: 0, fear: 0, joy: 0, love: 0, motivation: 2, sadness: 0, shame: 0, shock: 0, total: 4, dominant: 'motivation' },
+            '2022-04-11': { admiration: 1, anger: 5, envy: 0, fear: 4, joy: 4, love: 1, motivation: 2, sadness: 2, shame: 1, shock: 1, total: 21, dominant: 'anger' },
+            '2022-04-12': { admiration: 2, anger: 3, envy: 0, fear: 3, joy: 2, love: 1, motivation: 4, sadness: 1, shame: 1, shock: 0, total: 17, dominant: 'motivation' },
+            '2022-04-13': { admiration: 0, anger: 3, envy: 0, fear: 9, joy: 5, love: 1, motivation: 1, sadness: 5, shame: 2, shock: 1, total: 27, dominant: 'fear' },
+            '2022-04-14': { admiration: 6, anger: 2, envy: 0, fear: 6, joy: 7, love: 1, motivation: 3, sadness: 2, shame: 2, shock: 0, total: 29, dominant: 'joy' },
+            '2022-04-15': { admiration: 1, anger: 0, envy: 0, fear: 2, joy: 2, love: 1, motivation: 1, sadness: 2, shame: 2, shock: 1, total: 12, dominant: ['fear', 'joy', 'sadness', 'shame'] },
+            '2022-04-16': { admiration: 1, anger: 3, envy: 0, fear: 5, joy: 3, love: 0, motivation: 3, sadness: 3, shame: 1, shock: 1, total: 20, dominant: 'fear' },
+            '2022-04-17': { admiration: 1, anger: 4, envy: 0, fear: 2, joy: 4, love: 0, motivation: 4, sadness: 4, shame: 2, shock: 1, total: 22, dominant: ['anger', 'joy', 'motivation', 'sadness'] },
+            '2022-04-18': { admiration: 1, anger: 2, envy: 0, fear: 3, joy: 2, love: 1, motivation: 1, sadness: 3, shame: 0, shock: 3, total: 16, dominant: ['fear', 'sadness', 'shock'] },
+            '2022-04-19': { admiration: 1, anger: 3, envy: 0, fear: 4, joy: 1, love: 0, motivation: 3, sadness: 1, shame: 0, shock: 0, total: 13, dominant: 'fear' },
+            '2022-04-20': { admiration: 0, anger: 1, envy: 0, fear: 3, joy: 1, love: 0, motivation: 1, sadness: 1, shame: 0, shock: 0, total: 7, dominant: 'fear' },
+            '2022-04-21': { admiration: 1, anger: 1, envy: 0, fear: 5, joy: 3, love: 2, motivation: 2, sadness: 6, shame: 1, shock: 0, total: 21, dominant: 'sadness' },
+            '2022-04-22': { admiration: 1, anger: 0, envy: 0, fear: 0, joy: 3, love: 0, motivation: 0, sadness: 0, shame: 0, shock: 0, total: 4, dominant: 'joy' },
+            '2022-04-23': { admiration: 3, anger: 1, envy: 0, fear: 2, joy: 0, love: 0, motivation: 1, sadness: 0, shame: 0, shock: 0, total: 7, dominant: 'admiration' }
+        };
+
+        const EMOTION_COLORS = {
+            'fear': '#00141C', 'anger': '#430E1E', 'sadness': '#666A69', 'motivation': '#2F4E45',
+            'joy': '#6f91ae', 'admiration': '#9f8d72', 'shock': '#EBEBEB', 'shame': '#D4BDC3',
+            'love': '#E2725B', 'envy': '#228B22'
+        };
+        
+        const COLORBLIND_COLORS = { ...EMOTION_COLORS, 'joy': '#996633', 'fear': '#1E2530', 'sadness': '#1b444b' };
+        
+        let currentState = {
+            currentDate: new Date('2022-02-24'), endDate: new Date('2022-04-23'), currentDayIndex: 0,
+            isPlaying: false, isPaused: false, soundEnabled: true, colorblindMode: false,
+            animationTimerId: null, monthDominance: {}, audioInitialized: false, tutorialActive: false
+        };
+        
+        const ALL_DATES = [];
+        let dateLoop = new Date('2022-02-24');
+        while (dateLoop <= new Date('2022-04-23')) {
+            ALL_DATES.push(new Date(dateLoop));
+            dateLoop.setDate(dateLoop.getDate() + 1);
+        }
+        
+        function getFirstDayOffsetMonday(year, month) {
+            let firstDayIndex = new Date(year, month, 1).getDay();
+            return firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+        }
+        
+        function getDayAbbreviationEU(i) {
+            return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i];
+        }
+        
+        function formatDate(date) {
+            let y = date.getFullYear();
+            let m = String(date.getMonth() + 1).padStart(2, '0');
+            let d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        
+        function capitalizeFirst(s) {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+        
+        function getEmotionColor(emo) {
+            return currentState.colorblindMode ? (COLORBLIND_COLORS[emo] || '#FFFFFF') : (EMOTION_COLORS[emo] || '#FFFFFF');
+        }
+        
+        function populateMonthCalendarEU(year, month, gridElement) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const offset = getFirstDayOffsetMonday(year, month);
+            
+            for (let i = 0; i < offset; i++) {
+                let empty = document.createElement('div');
+                empty.className = 'day-cell empty-cell pre-post-period';
+                gridElement.appendChild(empty);
+            }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isInPeriod = dateStr >= '2022-02-24' && dateStr <= '2022-04-23';
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day-cell';
+                dayCell.dataset.date = dateStr;
+                dayCell.textContent = isInPeriod ? day : '';
+                
+                if (isInPeriod && EMOTION_DATA[dateStr]) {
+                    dayCell.classList.add('in-period');
+                    const infoIcon = document.createElement('div');
+                    infoIcon.className = 'info-icon';
+                    infoIcon.textContent = 'i';
+                    dayCell.appendChild(infoIcon);
+                    const popup = document.createElement('div');
+                    popup.className = 'stats-popup';
+                    dayCell.appendChild(popup);
+                    setupDayInteractions(dayCell);
+                } else {
+                    dayCell.classList.add('pre-post-period', 'empty-cell');
+                }
+                gridElement.appendChild(dayCell);
+            }
+        }
+        
+        function setupDayInteractions(cell) {
+            let longPressTimer, isLongPress = false;
+            
+            cell.addEventListener('mouseenter', () => {
+                if (!currentState.isPlaying || currentState.isPaused) {
+                    showStatsPopup(cell);
+                }
+            });
+            
+            cell.addEventListener('mouseleave', () => hideStatsPopup(cell));
+            
+            cell.addEventListener('click', (e) => {
+                if (!cell.classList.contains('in-period')) return;
+                e.stopPropagation();
+                if (!isLongPress) {
+                    showStatsPopup(cell);
+                    if (currentState.isPlaying && !currentState.isPaused) {
+                        pauseAnimation();
+                    }
+                }
+                isLongPress = false;
+            });
+            
+            cell.addEventListener('touchstart', (e) => {
+                if (!cell.classList.contains('in-period')) return;
+                longPressTimer = setTimeout(() => {
+                    isLongPress = true;
+                    showStatsPopup(cell);
+                    e.preventDefault();
+                }, 500);
+            });
+            
+            cell.addEventListener('touchend', () => clearTimeout(longPressTimer));
+            cell.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+        }
+        
+        function showStatsPopup(cell) {
+            const popup = cell.querySelector('.stats-popup');
+            if (!popup) return;
+            popup.classList.remove('left-edge', 'right-edge');
+            
+            const data = EMOTION_DATA[cell.dataset.date];
+            if (!data) return;
+            
+            const topEmotions = Object.entries(data)
+                .filter(([k]) => !['total', 'dominant'].includes(k))
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+            const maxCount = Math.max(...topEmotions.map(([_, c]) => c));
+            
+            const formattedDate = new Date(cell.dataset.date).toLocaleDateString('en-GB', {
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            popup.innerHTML = `
+                <div class="stats-title">${formattedDate}</div>
+                ${topEmotions.map(([emo, cnt]) => `
+                    <div class="emotion-bar">
+                        <div class="emotion-color" style="background: ${getEmotionColor(emo)}"></div>
+                        <div class="emotion-name">${capitalizeFirst(emo)}</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: ${(cnt / maxCount) * 100}%; background: ${getEmotionColor(emo)}"></div>
+                        </div>
+                        <div class="emotion-count">${cnt}</div>
+                    </div>
+                `).join('')}
+            `;
+            
+            const container = cell.closest('.month-calendar').getBoundingClientRect();
+            const rect = cell.getBoundingClientRect();
+            if (rect.left - 125 < container.left) {
+                popup.classList.add('left-edge');
+            } else if (rect.right + 125 > container.right) {
+                popup.classList.add('right-edge');
+            }
+            popup.classList.add('visible');
+        }
+        
+        function hideStatsPopup(cell) {
+            let p = cell.querySelector('.stats-popup');
+            if (p) p.classList.remove('visible');
+        }
+        
+        function colorDayCellEnhanced(cell, data) {
+            let dom = data.dominant;
+            cell.style.background = '';
+            cell.style.backgroundImage = '';
+            let icon = cell.querySelector('.info-icon');
+            if (icon) icon.style.display = 'none';
+            
+            if (Array.isArray(dom) && dom.length > 1) {
+                let colors = dom.map(e => getEmotionColor(e));
+                if (dom.length === 2) {
+                    cell.style.background = `linear-gradient(135deg, ${colors[0]} 50%, ${colors[1]} 50%)`;
+                } else {
+                    cell.style.background = `radial-gradient(circle at 30% 30%, ${colors[0]} 25%, transparent 25%), radial-gradient(circle at 70% 30%, ${colors[1]} 25%, transparent 25%), radial-gradient(circle at 50% 70%, ${colors[2] || colors[0]} 25%, transparent 25%), ${colors[0]}`;
+                }
+            } else {
+                let c = Array.isArray(dom) ? getEmotionColor(dom[0]) : getEmotionColor(dom);
+                cell.style.backgroundColor = c;
+            }
+        }
+        
+        function getDayDuration(total) {
+            return total <= 30 ? 400 : total <= 70 ? 700 : 1200;
+        }
+        
+        const TOP_5_DAYS = ['2022-03-05', '2022-03-03', '2022-03-04', '2022-03-02', '2022-02-24'];
+        
+        let audioContext = null;
+        let metronomeTimeoutId = null;
+        let isAnimationActive = false;
+        let targetTempo = 60;
+        
+        function initAudio() {
+            if (currentState.audioInitialized) return;
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                currentState.audioInitialized = true;
+                startMetronomeScheduling();
+            } catch (e) {}
+        }
+        
+        function playMetronomeBeat() {
+            if (!audioContext || !currentState.soundEnabled || currentState.isPaused) return;
+            let osc = audioContext.createOscillator();
+            let gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.type = 'sine';
+            osc.frequency.value = 600;
+            let vol = isAnimationActive ? 0.08 : 0.05;
+            let now = audioContext.currentTime;
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.1);
+            osc.onended = () => {
+                osc.disconnect();
+                gain.disconnect();
+            };
+        }
+        
+        function startMetronomeScheduling() {
+            if (!audioContext) return;
+            if (metronomeTimeoutId) clearTimeout(metronomeTimeoutId);
+            if (!currentState.soundEnabled || currentState.isPaused) {
+                metronomeTimeoutId = setTimeout(() => startMetronomeScheduling(), 100);
+                return;
+            }
+            let effectiveTempo = isAnimationActive ? targetTempo * 2 : targetTempo;
+            let interval = (60 / effectiveTempo) * 1000;
+            if (isAnimationActive && currentState.soundEnabled && !currentState.isPaused) {
+                playMetronomeBeat();
+            }
+            metronomeTimeoutId = setTimeout(() => {
+                if (currentState.soundEnabled && !currentState.isPaused) {
+                    playMetronomeBeat();
+                }
+                startMetronomeScheduling();
+            }, interval);
+        }
+        
+        function stopMetronomeScheduling() {
+            if (metronomeTimeoutId) clearTimeout(metronomeTimeoutId);
+            metronomeTimeoutId = null;
+        }
+        
+        function updateMetronomeTempo(total) {
+            targetTempo = Math.max(48, Math.min(72, 60 + (total - 30) * 0.3));
+        }
+        
+        function animateDay(idx) {
+            if (idx >= ALL_DATES.length) {
+                endAnimation();
+                return;
+            }
+            
+            currentState.currentDayIndex = idx;
+            currentState.currentDate = ALL_DATES[idx];
+            let ds = formatDate(currentState.currentDate);
+            let ed = EMOTION_DATA[ds];
+            
+            if (!ed) {
+                currentState.animationTimerId = setTimeout(() => animateDay(idx + 1), 100);
+                return;
+            }
+            
+            updateProgressInfo();
+            let cell = document.querySelector(`.day-cell[data-date="${ds}"]`);
+            
+            if (!cell) {
+                currentState.animationTimerId = setTimeout(() => animateDay(idx + 1), 100);
+                return;
+            }
+            
+            colorDayCellEnhanced(cell, ed);
+            cell.classList.add('current');
+            
+            if (TOP_5_DAYS.includes(ds)) {
+                cell.classList.add('pulsing');
+                setTimeout(() => cell.classList.remove('pulsing'), 300);
+                setTimeout(() => cell.classList.add('pulsing'), 450);
+            }
+            
+            updateMetronomeTempo(ed.total);
+            let duration = getDayDuration(ed.total);
+            
+            currentState.animationTimerId = setTimeout(() => {
+                if (!currentState.isPlaying || currentState.isPaused) return;
+                cell.classList.remove('current', 'pulsing');
+                let ic = cell.querySelector('.info-icon');
+                if (ic) ic.style.display = 'block';
+                animateDay(idx + 1);
+            }, duration);
+        }
+        
+        function startAnimation() {
+            if (currentState.isPlaying) return;
+            if (!currentState.audioInitialized) initAudio();
+            isAnimationActive = true;
+            if (currentState.soundEnabled && audioContext) startMetronomeScheduling();
+            currentState.isPlaying = true;
+            currentState.isPaused = false;
+            currentState.currentDayIndex = 0;
+            updateControlButtons();
+            document.querySelectorAll('.stats-popup.visible').forEach(p => p.classList.remove('visible'));
+            animateDay(0);
+        }
+        
+        function pauseAnimation() {
+            if (!currentState.isPlaying || currentState.isPaused) return;
+            currentState.isPaused = true;
+            isAnimationActive = false;
+            if (currentState.animationTimerId) clearTimeout(currentState.animationTimerId);
+            document.querySelectorAll('.day-cell.current').forEach(c => c.classList.remove('current'));
+            updateControlButtons();
+        }
+        
+        function resumeAnimation() {
+            if (!currentState.isPlaying || !currentState.isPaused) return;
+            currentState.isPaused = false;
+            isAnimationActive = true;
+            if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+            animateDay(currentState.currentDayIndex);
+            updateControlButtons();
+        }
+        
+        function resetAnimation() {
+            if (currentState.animationTimerId) clearTimeout(currentState.animationTimerId);
+            isAnimationActive = false;
+            stopMetronomeScheduling();
+            document.querySelectorAll('.day-cell.in-period').forEach(c => {
+                c.className = 'day-cell in-period';
+                c.style.background = '';
+                let ic = c.querySelector('.info-icon');
+                if (ic) ic.style.display = 'block';
+                hideStatsPopup(c);
+            });
+            currentState.currentDayIndex = 0;
+            currentState.isPlaying = false;
+            currentState.isPaused = false;
+            updateProgressInfo();
+            updateControlButtons();
+            currentState.tutorialActive = false;
+            setTimeout(() => setupInitialDemo(), 100);
+        }
+        
+        function endAnimation() {
+            currentState.isPlaying = false;
+            isAnimationActive = false;
+            if (currentState.animationTimerId) clearTimeout(currentState.animationTimerId);
+            updateControlButtons();
+            setTimeout(() => showSummaryScreen(), 500);
+        }
+        
+        function showSummaryScreen() {
+            const totals = {};
+            Object.values(EMOTION_DATA).forEach(data => {
+                Object.entries(data).forEach(([emo, cnt]) => {
+                    if (!['total', 'dominant'].includes(emo)) {
+                        totals[emo] = (totals[emo] || 0) + cnt;
+                    }
+                });
+            });
+            
+            const topEmotions = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            const maxCount = Math.max(...topEmotions.map(([_, c]) => c));
+            
+            elements.summaryBars.innerHTML = topEmotions.map(([emo, cnt]) => `
+                <div class="summary-bar">
+                    <div class="summary-bar-label">
+                        <span>${capitalizeFirst(emo)}</span>
+                        <span>${cnt} expressions</span>
+                    </div>
+                    <div class="summary-bar-fill">
+                        <div class="summary-fill" style="width: 0%; background-color: ${getEmotionColor(emo)}"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            elements.summaryScreen.classList.add('visible');
+            
+            setTimeout(() => {
+                document.querySelectorAll('.summary-fill').forEach((fill, idx) => {
+                    const targetWidth = (topEmotions[idx][1] / maxCount) * 100;
+                    fill.style.transition = 'width 1.2s ease-out';
+                    fill.style.width = `${targetWidth}%`;
+                });
+            }, 200);
+            
+            let countdown = 5;
+            elements.restartCountdown.textContent = countdown;
+            const interval = setInterval(() => {
+                countdown--;
+                elements.restartCountdown.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    restartAnimation();
+                }
+            }, 1000);
+        }
+        
+        function restartAnimation() {
+            elements.summaryScreen.classList.remove('visible');
+            stopMetronomeScheduling();
+            isAnimationActive = false;
+            currentState.isPlaying = false;
+            currentState.isPaused = false;
+            currentState.currentDayIndex = 0;
+            updateControlButtons();
+            document.querySelectorAll('.day-cell.in-period').forEach(c => {
+                c.className = 'day-cell in-period';
+                c.style.background = '';
+                let ic = c.querySelector('.info-icon');
+                if (ic) ic.style.display = 'block';
+                hideStatsPopup(c);
+            });
+            currentState.tutorialActive = false;
+            setTimeout(() => {
+                setupInitialDemo();
+                setTimeout(() => startAnimation(), 3000);
+            }, 500);
+        }
+        
+        function setupInitialDemo() {
+            if (currentState.isPlaying || currentState.tutorialActive) return;
+            stopMetronomeScheduling();
+            isAnimationActive = false;
+            setTimeout(() => {
+                let cell = document.querySelector('.day-cell[data-date="2022-02-24"]');
+                if (cell && cell.classList.contains('in-period')) {
+                    showStatsPopup(cell);
+                    currentState.tutorialActive = true;
+                    let tid = setTimeout(() => {
+                        hideStatsPopup(cell);
+                        currentState.tutorialActive = false;
+                    }, 3000);
+                    cell.dataset.demoTimeout = tid;
+                }
+            }, 500);
+        }
+        
+        function updateProgressInfo() {
+            let cur = currentState.currentDayIndex + 1;
+            elements.currentDay.textContent = cur;
+            let pct = (cur / ALL_DATES.length) * 100;
+            elements.progressInfo.style.background = `linear-gradient(90deg, rgba(102,106,105,0.3) ${pct}%, rgba(255,255,255,0.05) ${pct}%)`;
+        }
+        
+        function updateControlButtons() {
+            if (currentState.isPlaying && !currentState.isPaused) {
+                elements.playBtn.disabled = true;
+                elements.pauseBtn.disabled = false;
+                elements.playText.textContent = 'Playing';
+            } else if (currentState.isPlaying && currentState.isPaused) {
+                elements.playBtn.disabled = false;
+                elements.pauseBtn.disabled = true;
+                elements.playText.textContent = 'Resume';
+            } else {
+                elements.playBtn.disabled = false;
+                elements.pauseBtn.disabled = true;
+                elements.playText.textContent = 'Play';
+            }
+        }
+        
+        function toggleSound() {
+            if (!currentState.audioInitialized) {
+                initAudio();
+                return;
+            }
+            currentState.soundEnabled = !currentState.soundEnabled;
+            let icon = elements.audioToggle.querySelector('.btn-icon');
+            icon.textContent = currentState.soundEnabled ? '🔊' : '🔇';
+            if (!currentState.soundEnabled) {
+                stopMetronomeScheduling();
+            } else if (currentState.soundEnabled && audioContext) {
+                startMetronomeScheduling();
+            }
+        }
+        
+        function setupEventListeners() {
+            elements.playBtn.addEventListener('click', () => {
+                let f24 = document.querySelector('.day-cell[data-date="2022-02-24"]');
+                if (f24 && f24.dataset.demoTimeout) {
+                    clearTimeout(parseInt(f24.dataset.demoTimeout));
+                    delete f24.dataset.demoTimeout;
+                    hideStatsPopup(f24);
+                }
+                if (currentState.isPlaying && currentState.isPaused) {
+                    resumeAnimation();
+                } else {
+                    startAnimation();
+                }
+            });
+            
+            elements.pauseBtn.addEventListener('click', pauseAnimation);
+            elements.resetBtn.addEventListener('click', resetAnimation);
+            elements.audioToggle.addEventListener('click', toggleSound);
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    if (currentState.isPlaying && !currentState.isPaused) {
+                        pauseAnimation();
+                    } else if (currentState.isPlaying && currentState.isPaused) {
+                        resumeAnimation();
+                    } else {
+                        startAnimation();
+                    }
+                }
+                if (e.code === 'KeyM') {
+                    e.preventDefault();
+                    toggleSound();
+                }
+            });
+        }
+        
+        function initializeCalendarsEU() {
+            const headers = Array.from({ length: 7 }, (_, i) => {
+                let div = document.createElement('div');
+                div.className = 'day-header';
+                div.textContent = getDayAbbreviationEU(i);
+                return div;
+            });
+            
+            [elements.februaryGrid, elements.marchGrid, elements.aprilGrid].forEach(grid => {
+                headers.forEach(h => grid.appendChild(h.cloneNode(true)));
+            });
+            
+            populateMonthCalendarEU(2022, 1, elements.februaryGrid);
+            populateMonthCalendarEU(2022, 2, elements.marchGrid);
+            populateMonthCalendarEU(2022, 3, elements.aprilGrid);
+        }
+        
+        function simulateLoading() {
+            let progress = 0;
+            let iv = setInterval(() => {
+                progress += 2;
+                elements.loadingProgress.style.width = `${progress}%`;
+                if (progress >= 100) {
+                    clearInterval(iv);
+                    elements.tapToBegin.style.display = 'block';
+                    elements.tapToBegin.addEventListener('click', () => {
+                        elements.loadingScreen.classList.add('fade-out');
+                        setTimeout(() => {
+                            elements.loadingScreen.style.display = 'none';
+                            elements.mainContainer.style.display = 'block';
+                            setupInitialDemo();
+                        }, 500);
+                    });
+                }
+            }, 30);
+        }
+        
+        const elements = {};
+        document.addEventListener('DOMContentLoaded', () => {
+            elements.loadingScreen = document.getElementById('loading-screen');
+            elements.loadingProgress = document.getElementById('loading-progress');
+            elements.tapToBegin = document.getElementById('tap-to-begin');
+            elements.mainContainer = document.getElementById('main-container');
+            elements.playBtn = document.getElementById('play-btn');
+            elements.pauseBtn = document.getElementById('pause-btn');
+            elements.resetBtn = document.getElementById('reset-btn');
+            elements.audioToggle = document.getElementById('audio-toggle');
+            elements.currentDay = document.getElementById('current-day');
+            elements.progressInfo = document.getElementById('progress-info');
+            elements.februaryGrid = document.getElementById('february-grid');
+            elements.marchGrid = document.getElementById('march-grid');
+            elements.aprilGrid = document.getElementById('april-grid');
+            elements.februaryCalendar = document.getElementById('february-calendar');
+            elements.marchCalendar = document.getElementById('march-calendar');
+            elements.aprilCalendar = document.getElementById('april-calendar');
+            elements.summaryScreen = document.getElementById('summary-screen');
+            elements.restartCountdown = document.getElementById('restart-countdown');
+            elements.summaryBars = document.getElementById('summary-bars');
+            elements.playText = document.getElementById('play-text');
+            
+            initializeCalendarsEU();
+            setupEventListeners();
+            simulateLoading();
+        });
+    </script>
+</body>
+</html>
