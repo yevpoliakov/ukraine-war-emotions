@@ -52,7 +52,7 @@ https://yevpoliakov.github.io/ukraine-war-emotions/
 
 ## Acknowledgments
 
-This project was supported by a scholarship from the Institute for Human Sciences (IWM) in Vienna as part of the Documenting Ukraine initiative.
+This project was supported by a grant from the Institute for Human Sciences (IWM) in Vienna as part of the Documenting Ukraine initiative.
 Idea, computation, and visualization: Yevhenii Poliakov
 
 ## Technical Details
