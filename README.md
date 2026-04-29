@@ -49,6 +49,7 @@ https://yevpoliakov.github.io/ukraine-war-emotions/
 ## Data Source
 
 "The Diaries and Dreams of the War" archives at Center for Urban History, Lviv, Ukraine
+
 Link: [https://www.lvivcenter.org/en/researches/diaries-and-dreams-of-the-war-2/](https://www.lvivcenter.org/en/researches/diaries-and-dreams-of-the-war-2/)
 
 ## Acknowledgments
