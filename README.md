@@ -41,6 +41,11 @@ The data captures 10 emotions:
 
 Days with multiple dominant emotions are shown as patterns.
 
+## Demo
+
+The calendar is available at:  
+`https://yevpoliakov.github.io/ukraine-war-emotions/`
+
 ## Data Source
 
 "The Diaries and Dreams of the War" archives at Center for Urban History, Lviv, Ukraine
