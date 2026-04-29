@@ -44,7 +44,7 @@ Days with multiple dominant emotions are shown as patterns.
 ## Demo
 
 The calendar is available at:  
-`https://yevpoliakov.github.io/ukraine-war-emotions/`
+[https://yevpoliakov.github.io/ukraine-war-emotions/)
 
 ## Data Source
 
